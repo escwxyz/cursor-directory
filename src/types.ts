@@ -13,4 +13,21 @@ interface Author {
   avatar: string;
 }
 
-export type { Prompt, Author };
+interface Category {
+  slug: string;
+  prompts: Prompt[];
+}
+
+interface Video {
+  title: string;
+  description: string;
+  url: string;
+  author: VideoAuthor;
+}
+
+interface VideoAuthor {
+  name: string;
+  image: string;
+}
+
+export type { Prompt, Author, Category, Video, VideoAuthor };

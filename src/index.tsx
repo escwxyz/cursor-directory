@@ -1,32 +1,26 @@
-import { ActionPanel, Action, Icon, List } from "@raycast/api";
+import { LaunchProps, Grid } from "@raycast/api";
+import { PromptsList } from "./components/PromptsList";
 
-const ITEMS = Array.from(Array(3).keys()).map((key) => {
-  return {
-    id: key,
-    icon: Icon.Bird,
-    title: "Title " + key,
-    subtitle: "Subtitle",
-    accessory: "Accessory",
-  };
-});
+export default function Command(props: LaunchProps<{ arguments: Arguments.Index }>) {
 
-export default function Command() {
+  const { type } = props.arguments;
+
   return (
-    <List>
-      {ITEMS.map((item) => (
-        <List.Item
-          key={item.id}
-          icon={item.icon}
-          title={item.title}
-          subtitle={item.subtitle}
-          accessories={[{ icon: Icon.Text, text: item.accessory }]}
-          actions={
-            <ActionPanel>
-              <Action.CopyToClipboard content={item.title} />
-            </ActionPanel>
-          }
-        />
-      ))}
-    </List>
+    <>
+      {
+        type === "prompt" ? <PromptsList /> :
+          <Grid
+            inset={Grid.Inset.Large}
+            navigationTitle="Search Video"
+            searchBarPlaceholder="Search video about cursor code editor"
+          // TODO
+          >
+            <Grid.EmptyView />
+          </Grid>
+      }
+    </>
   );
 }
+
+
+

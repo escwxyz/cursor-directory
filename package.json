@@ -12,10 +12,28 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "cursor-directory",
+      "name": "index",
       "title": "Cursor Directory",
-      "description": "Browse prompts by language",
-      "mode": "view"
+      "description": "Search prompts and videos from cursor.directory",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "type",
+          "placeholder": "Prompt or Video",
+          "type": "dropdown",
+          "required": true,
+          "data": [
+            {
+              "title": "Prompt",
+              "value": "prompt"
+            },
+            {
+              "title": "Video",
+              "value": "video"
+            }
+          ]
+        }
+      ]
     }
   ],
   "dependencies": {
@@ -31,13 +49,12 @@
     "@typescript-eslint/utils": "^8.3.0",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",
-    "ts-node": "^10.9.1",
     "tsx": "^4.19.0",
     "typescript": "^5.4.5"
   },
   "scripts": {
     "update-prompts": "tsx src/updatePrompts.ts",
-    "build": "ray build -e dist",
+    "build": "tsx src/updatePrompts.ts && ray build -e dist",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",

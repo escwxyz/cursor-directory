@@ -1,12 +1,18 @@
+// TODO: add video support
+
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
+
 import { parse } from '@babel/parser';
 import * as t from '@babel/types';
 
 import type { Prompt } from './types';
 
-const RULES_URL = 'https://api.github.com/repos/pontusab/cursor.directory/contents/src/data/rules';
+const DATA_URL = 'https://api.github.com/repos/pontusab/cursor.directory/contents/src/data';
+
+const RULES_URL = DATA_URL + '/rules';
+// const VIDEOS_URL = 
 const OUTPUT_FILE = path.join(__dirname, '..', 'src', 'data', 'prompts.json');
 
 interface GithubFileContent {
@@ -35,7 +41,6 @@ async function fetchFileContent(url: string): Promise<string> {
     }).on('error', reject);
   });
 }
-
 
 async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
   const content = await fetchFileContent(file.download_url);
@@ -83,6 +88,9 @@ async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
         const key = prop.key.name;
         if (t.isStringLiteral(prop.value)) {
           rule[key] = prop.value.value;
+        } else if (t.isTemplateLiteral(prop.value)) {
+          // Handle template literals
+          rule[key] = prop.value.quasis.map(quasi => quasi.value.cooked).join('');
         } else if (t.isArrayExpression(prop.value)) {
           rule[key] = prop.value.elements.map(el =>
             t.isStringLiteral(el) ? el.value : null
@@ -90,8 +98,13 @@ async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
         } else if (t.isObjectExpression(prop.value)) {
           rule[key] = {};
           prop.value.properties.forEach(subProp => {
-            if (t.isObjectProperty(subProp) && t.isIdentifier(subProp.key) && t.isStringLiteral(subProp.value)) {
-              rule[key][subProp.key.name] = subProp.value.value;
+            if (t.isObjectProperty(subProp) && t.isIdentifier(subProp.key)) {
+              if (t.isStringLiteral(subProp.value)) {
+                rule[key][subProp.key.name] = subProp.value.value;
+              } else if (t.isTemplateLiteral(subProp.value)) {
+                // Handle template literals in nested objects
+                rule[key][subProp.key.name] = subProp.value.quasis.map(quasi => quasi.value.cooked).join('');
+              }
             }
           });
         }
@@ -100,11 +113,6 @@ async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
 
     return rule;
   });
-
-  console.log("rulesArray:\n", rulesArray);
-
-  // TODO: content is blank right now
-
 
   return rulesArray.map((rule: any) => ({
     tags: Array.isArray(rule.tags) ? rule.tags : [],
@@ -130,7 +138,7 @@ async function main() {
 
     const allPrompts = await Promise.all(tsFiles.map(processRuleFile));
 
-    console.log("allPrompts:\n", allPrompts);
+    console.log("Writing rule files...\n");
 
     const flattenedPrompts = allPrompts.flat();
 
