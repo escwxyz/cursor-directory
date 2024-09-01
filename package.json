@@ -14,26 +14,8 @@
     {
       "name": "index",
       "title": "Cursor Directory",
-      "description": "Search prompts and videos from cursor.directory",
-      "mode": "view",
-      "arguments": [
-        {
-          "name": "type",
-          "placeholder": "Prompt or Video",
-          "type": "dropdown",
-          "required": true,
-          "data": [
-            {
-              "title": "Prompt",
-              "value": "prompt"
-            },
-            {
-              "title": "Video",
-              "value": "video"
-            }
-          ]
-        }
-      ]
+      "description": "Search system prompts from cursor.directory for Cursor Code Editor",
+      "mode": "view"
     }
   ],
   "dependencies": {

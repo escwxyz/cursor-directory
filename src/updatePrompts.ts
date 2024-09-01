@@ -1,18 +1,12 @@
-// TODO: add video support
-
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
-
 import { parse } from '@babel/parser';
 import * as t from '@babel/types';
-
 import type { Prompt } from './types';
 
 const DATA_URL = 'https://api.github.com/repos/pontusab/cursor.directory/contents/src/data';
-
 const RULES_URL = DATA_URL + '/rules';
-// const VIDEOS_URL = 
 const OUTPUT_FILE = path.join(__dirname, '..', 'src', 'data', 'prompts.json');
 
 interface GithubFileContent {
@@ -125,12 +119,9 @@ async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
 }
 
 
-// -------------------------------------------
-
 async function main() {
   try {
     const files: GithubFileContent[] = await fetchJson(RULES_URL);
-
 
     const tsFiles = files.filter(file => file.name.endsWith('.ts'));
 

@@ -1,23 +1,15 @@
-import { LaunchProps, Grid } from "@raycast/api";
 import { PromptsList } from "./components/PromptsList";
+import { cache } from "./utils";
 
-export default function Command(props: LaunchProps<{ arguments: Arguments.Index }>) {
+cache.set("favoritePrompts", JSON.stringify([]));
 
-  const { type } = props.arguments;
+export default function Command() {
+
+  // const { type } = props.arguments;
 
   return (
     <>
-      {
-        type === "prompt" ? <PromptsList /> :
-          <Grid
-            inset={Grid.Inset.Large}
-            navigationTitle="Search Video"
-            searchBarPlaceholder="Search video about cursor code editor"
-          // TODO
-          >
-            <Grid.EmptyView />
-          </Grid>
-      }
+      <PromptsList />
     </>
   );
 }

@@ -1,8 +1,7 @@
 import { Prompt } from "../types"
 import { Action, ActionPanel, Detail, Image, Icon } from "@raycast/api";
-
 import { getAvatarIcon } from "@raycast/utils";
-import { CreatePromptForm } from "./CreatePromptForm";
+import { isImageUrl } from "../utils";
 
 interface Props {
   prompt: Prompt;
@@ -13,13 +12,14 @@ export const PromptDetail = ({ prompt }: Props) => {
   return (
     <Detail
       navigationTitle={prompt.title}
+      // TODO not looking good
       markdown={`
 ${prompt.content}
       `}
       metadata={
         <Detail.Metadata>
           <Detail.Metadata.Label title="Author" text={prompt.author.name} icon={{
-            source: prompt.author.avatar || getAvatarIcon(prompt.author.name),
+            source: isImageUrl(prompt.author.avatar) && prompt.author.avatar || getAvatarIcon(prompt.author.name),
             mask: Image.Mask.Circle,
           }} />
           {
@@ -43,13 +43,12 @@ ${prompt.content}
           }
         </Detail.Metadata>
       }
-
       actions={
         <ActionPanel>
           <Action.CopyToClipboard
             title="Copy Prompt"
             icon={Icon.Clipboard}
-            content={`test content`}
+            content={prompt.content}
             shortcut={{ modifiers: ["cmd"], key: "c" }}
           />
           <Action.OpenInBrowser
@@ -69,15 +68,22 @@ ${prompt.content}
           <Action.CopyToClipboard
             title="Share Prompt"
             icon={Icon.Hashtag}
-            content={`share content`}
+            content={`https://cursor.directory/${prompt.slug}`}
             shortcut={{ modifiers: ["cmd"], key: "y" }}
           />
-          <Action.Push
-            title="Create Prompt"
-            icon={Icon.Pencil}
-            target={<CreatePromptForm />}
-          />
-
+          {
+            // TODO: save to favorites
+            // remove from favorites
+          }
+          {
+            // TODO: edit a prompt
+          }
+          {/* <Action.Push */}
+          {/*   title="Create Prompt" */}
+          {/*   icon={Icon.Pencil} */}
+          {/*   target={<CreatePromptForm />} */}
+          {/* /> */}
+          {/**/}
         </ActionPanel>
       }
     />

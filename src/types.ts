@@ -7,27 +7,15 @@ interface Prompt {
   author: Author;
 }
 
+interface Section {
+  name: string;
+  slugs: string[];
+}
+
 interface Author {
   name: string;
   url: string;
   avatar: string;
 }
 
-interface Category {
-  slug: string;
-  prompts: Prompt[];
-}
-
-interface Video {
-  title: string;
-  description: string;
-  url: string;
-  author: VideoAuthor;
-}
-
-interface VideoAuthor {
-  name: string;
-  image: string;
-}
-
-export type { Prompt, Author, Category, Video, VideoAuthor };
+export type { Prompt, Author, Section };
