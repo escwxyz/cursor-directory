@@ -1,38 +1,59 @@
-import fs from 'fs';
-import path from 'path';
-import https from 'https';
-import { parse } from '@babel/parser';
-import * as t from '@babel/types';
-import type { Prompt } from './types';
+import fs from "fs";
+import path from "path";
+import https from "https";
+import { parse } from "@babel/parser";
+import * as t from "@babel/types";
+import type { Author, Prompt } from "./types";
 
-const DATA_URL = 'https://api.github.com/repos/pontusab/cursor.directory/contents/src/data';
-const RULES_URL = DATA_URL + '/rules';
-const OUTPUT_FILE = path.join(__dirname, '..', 'src', 'data', 'prompts.json');
+const DATA_URL = "https://api.github.com/repos/pontusab/cursor.directory/contents/src/data";
+const RULES_URL = DATA_URL + "/rules";
+const OUTPUT_FILE = path.join(__dirname, "..", "src", "data", "prompts.json");
 
 interface GithubFileContent {
   name: string;
   download_url: string;
 }
 
+interface RuleObject {
+  tags?: string[];
+  title?: string;
+  slug?: string;
+  content?: string;
+  author?: {
+    name?: string;
+    url?: string;
+    avatar?: string;
+  };
+  libs?: string[];
+}
+
 function fetchJson(url: string): Promise<GithubFileContent[]> {
   return new Promise((resolve, reject) => {
-    https.get(url, {
-      headers: { 'User-Agent': 'Raycast Extension' }
-    }, (res) => {
-      let data = '';
-      res.on('data', (chunk) => data += chunk);
-      res.on('end', () => resolve(JSON.parse(data)));
-    }).on('error', reject);
+    https
+      .get(
+        url,
+        {
+          headers: { "User-Agent": "Raycast Extension" },
+        },
+        (res) => {
+          let data = "";
+          res.on("data", (chunk) => (data += chunk));
+          res.on("end", () => resolve(JSON.parse(data)));
+        },
+      )
+      .on("error", reject);
   });
 }
 
 async function fetchFileContent(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      let data = '';
-      res.on('data', (chunk) => data += chunk);
-      res.on('end', () => resolve(data));
-    }).on('error', reject);
+    https
+      .get(url, (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => resolve(data));
+      })
+      .on("error", reject);
   });
 }
 
@@ -41,14 +62,13 @@ async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
 
   // Parse the TypeScript content
   const ast = parse(content, {
-    sourceType: 'module',
-    plugins: ['typescript']
+    sourceType: "module",
+    plugins: ["typescript"],
   });
 
   // Find the export declaration
   const exportDeclaration = ast.program.body.find(
-    node => t.isExportNamedDeclaration(node) &&
-      t.isVariableDeclaration(node.declaration)
+    (node) => t.isExportNamedDeclaration(node) && t.isVariableDeclaration(node.declaration),
   ) as t.ExportNamedDeclaration | undefined;
 
   if (!exportDeclaration || !t.isVariableDeclaration(exportDeclaration.declaration)) {
@@ -61,7 +81,7 @@ async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
     throw new Error(`Unexpected declaration type in ${file.name}`);
   }
 
-  if (!t.isIdentifier(declaration.id) || !declaration.id.name.endsWith('Rules')) {
+  if (!t.isIdentifier(declaration.id) || !declaration.id.name.endsWith("Rules")) {
     throw new Error(`Expected identifier ending with 'Rules' in ${file.name}`);
   }
 
@@ -70,34 +90,42 @@ async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
   }
 
   // Process each object in the array
-  const rulesArray = declaration.init.elements.map(element => {
+  const rulesArray = declaration.init.elements.map((element) => {
     if (!element || !t.isObjectExpression(element)) {
       throw new Error(`Expected object expression in rules array in ${file.name}`);
     }
 
-    const rule: any = {};
+    const rule: RuleObject = {};
+    // const rule = {} as Record<string, string | string[] | Record<string, string>>;
 
-    element.properties.forEach(prop => {
+    element.properties.forEach((prop) => {
       if (t.isObjectProperty(prop) && t.isIdentifier(prop.key)) {
-        const key = prop.key.name;
+        const key = prop.key.name as keyof RuleObject;
         if (t.isStringLiteral(prop.value)) {
-          rule[key] = prop.value.value;
+          if (key === "title" || key === "slug" || key === "content") {
+            rule[key] = prop.value.value;
+          }
         } else if (t.isTemplateLiteral(prop.value)) {
-          // Handle template literals
-          rule[key] = prop.value.quasis.map(quasi => quasi.value.cooked).join('');
+          const value = prop.value.quasis.map((quasi) => quasi.value.cooked).join("");
+          if (key === "title" || key === "slug" || key === "content") {
+            rule[key] = value;
+          }
         } else if (t.isArrayExpression(prop.value)) {
-          rule[key] = prop.value.elements.map(el =>
-            t.isStringLiteral(el) ? el.value : null
-          ).filter(el => el !== null);
-        } else if (t.isObjectExpression(prop.value)) {
-          rule[key] = {};
-          prop.value.properties.forEach(subProp => {
+          const value = prop.value.elements
+            .map((el): string | null => (t.isStringLiteral(el) ? el.value : null))
+            .filter((el): el is string => el !== null);
+          if (key === "tags" || key === "libs") {
+            rule[key] = value;
+          }
+        } else if (t.isObjectExpression(prop.value) && key === "author") {
+          rule.author = {};
+          prop.value.properties.forEach((subProp) => {
             if (t.isObjectProperty(subProp) && t.isIdentifier(subProp.key)) {
+              const subKey = subProp.key.name as keyof Author;
               if (t.isStringLiteral(subProp.value)) {
-                rule[key][subProp.key.name] = subProp.value.value;
+                rule.author![subKey] = subProp.value.value;
               } else if (t.isTemplateLiteral(subProp.value)) {
-                // Handle template literals in nested objects
-                rule[key][subProp.key.name] = subProp.value.quasis.map(quasi => quasi.value.cooked).join('');
+                rule.author![subKey] = subProp.value.quasis.map((quasi) => quasi.value.cooked).join("");
               }
             }
           });
@@ -108,22 +136,29 @@ async function processRuleFile(file: GithubFileContent): Promise<Prompt[]> {
     return rule;
   });
 
-  return rulesArray.map((rule: any) => ({
-    tags: Array.isArray(rule.tags) ? rule.tags : [],
-    title: typeof rule.title === 'string' ? rule.title : '',
-    slug: typeof rule.slug === 'string' ? rule.slug : '',
-    content: typeof rule.content === 'string' ? rule.content : '',
-    author: typeof rule.author === 'object' ? rule.author : { name: '', url: '', avatar: '' },
-    libs: Array.isArray(rule.libs) ? rule.libs : []
-  }));
+  return rulesArray.map(
+    (rule): Prompt => ({
+      tags: rule.tags || [],
+      title: rule.title || "",
+      slug: rule.slug || "",
+      content: rule.content || "",
+      author: rule.author
+        ? {
+            name: rule.author.name || "",
+            url: rule.author.url || "",
+            avatar: rule.author.avatar || "",
+          }
+        : { name: "", url: "", avatar: "" },
+      libs: rule.libs || [],
+    }),
+  );
 }
-
 
 async function main() {
   try {
     const files: GithubFileContent[] = await fetchJson(RULES_URL);
 
-    const tsFiles = files.filter(file => file.name.endsWith('.ts'));
+    const tsFiles = files.filter((file) => file.name.endsWith(".ts"));
 
     console.log("Processing rule files...\n");
 
@@ -136,7 +171,7 @@ async function main() {
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(flattenedPrompts, null, 2));
     console.log(`Updated prompts saved to ${OUTPUT_FILE}`);
   } catch (error) {
-    console.error('Error updating prompts:', error);
+    console.error("Error updating prompts:", error);
   }
 }
 

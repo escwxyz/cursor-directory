@@ -5,7 +5,6 @@ import { PromptListItem } from "./PromptListItem";
 import { fetchSections } from "../utils";
 
 export const PromptsList = () => {
-
   const [showingDetail, setShowingDetail] = useState<boolean>(true);
 
   // const cached = cache.get("favoritePrompts");
@@ -26,24 +25,19 @@ export const PromptsList = () => {
       {/*     /> */}
       {/*   )) */}
       {/* } */}
-      {
-        sections?.map((section) => (
-          <List.Section key={section.name} title={section.name}>
-            {
-              section.slugs.map((slug, index) => (
-                <PromptListItem
-                  key={slug + index} // remove index for release version
-                  slug={slug}
-                  section={section.name}
-                  setShowingDetail={setShowingDetail}
-                  showingDetail={showingDetail}
-                />
-              ))
-            }
-          </List.Section>
-        ))
-      }
-    </List>)
-}
-
-
+      {sections?.map((section) => (
+        <List.Section key={section.name} title={section.name}>
+          {section.slugs.map((slug, index) => (
+            <PromptListItem
+              key={slug + index} // remove index for release version
+              slug={slug}
+              section={section.name}
+              setShowingDetail={setShowingDetail}
+              showingDetail={showingDetail}
+            />
+          ))}
+        </List.Section>
+      ))}
+    </List>
+  );
+};
