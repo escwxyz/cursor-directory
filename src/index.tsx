@@ -130,7 +130,11 @@ export default function Command() {
                         /> */}
                       </ActionPanel.Section>
                       <ActionPanel.Section title="Settings">
-                        <Action title="Open Extension Preferences" onAction={openExtensionPreferences} />
+                        <Action
+                          title="Open Extension Preferences"
+                          icon={Icon.Gear}
+                          onAction={openExtensionPreferences}
+                        />
                       </ActionPanel.Section>
                     </ActionPanel>
                   }
