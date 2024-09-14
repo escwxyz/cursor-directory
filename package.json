@@ -26,6 +26,24 @@
       "required": false,
       "default": true,
       "description": "Show detailed view in prompts list"
+    },
+    {
+      "name": "default_prompts_list",
+      "title": "Default Prompts List",
+      "type": "dropdown",
+      "required": false,
+      "default": "popular",
+      "description": "If show all prompts or only popular ones in prompts list",
+      "data": [
+        {
+          "title": "Popular",
+          "value": "popular"
+        },
+        {
+          "title": "All",
+          "value": "all"
+        }
+      ]
     }
   ],
   "license": "MIT",

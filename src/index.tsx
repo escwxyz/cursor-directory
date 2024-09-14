@@ -18,11 +18,11 @@ import { PromptDetail } from "./components/PromptDetail";
 import { fetchPrompts } from "./api";
 
 export default function Command() {
-  const { show_detailed_view } = getPreferenceValues<Preferences>();
+  const { show_detailed_view, default_prompts_list } = getPreferenceValues<Preferences>();
 
   const [error, setError] = useState<Error | undefined>(undefined);
   const [showingDetail, setShowingDetail] = useState<boolean>(show_detailed_view);
-  const [popularOnly, setPopularOnly] = useState<boolean>(true);
+  const [popularOnly, setPopularOnly] = useState<boolean>(default_prompts_list === "popular");
 
   const { data, isLoading, revalidate } = usePromise(async () => {
     try {
