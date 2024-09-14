@@ -17,6 +17,15 @@
       "required": false,
       "default": "1",
       "description": "How many days should the local cache expire"
+    },
+    {
+      "name": "show_detailed_view",
+      "title": "Show Detailed View",
+      "label": "Show detailed view in prompts list",
+      "type": "checkbox",
+      "required": false,
+      "default": true,
+      "description": "Show detailed view in prompts list"
     }
   ],
   "license": "MIT",

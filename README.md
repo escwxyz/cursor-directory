@@ -26,3 +26,4 @@ for usage in the Cursor Code Editor.
 Access preferences through the Action Panel or Raycast settings:
 
 - Cache Duration: Prompt data is cached locally for 1 day by default.
+- Show Detailed View: Toggle the display of detailed view in prompts list.

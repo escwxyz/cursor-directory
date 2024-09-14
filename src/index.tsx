@@ -9,6 +9,7 @@ import {
   Toast,
   showHUD,
   Clipboard,
+  getPreferenceValues,
 } from "@raycast/api";
 import { getAvatarIcon, usePromise } from "@raycast/utils";
 import { getSections, processContent } from "./utils";
@@ -17,8 +18,10 @@ import { PromptDetail } from "./components/PromptDetail";
 import { fetchPrompts } from "./api";
 
 export default function Command() {
+  const { show_detailed_view } = getPreferenceValues<Preferences>();
+
   const [error, setError] = useState<Error | undefined>(undefined);
-  const [showingDetail, setShowingDetail] = useState<boolean>(true);
+  const [showingDetail, setShowingDetail] = useState<boolean>(show_detailed_view);
   const [popularOnly, setPopularOnly] = useState<boolean>(true);
 
   const { data, isLoading, revalidate } = usePromise(async () => {
@@ -128,8 +131,8 @@ export default function Command() {
                           }}
                         />
                         <Action
-                          title="Toggle Detail"
-                          icon={Icon.List}
+                          title={showingDetail ? "Show List View" : "Show Detailed View"}
+                          icon={showingDetail ? Icon.List : Icon.Text}
                           shortcut={{ modifiers: ["cmd"], key: "d" }}
                           onAction={() => setShowingDetail(!showingDetail)}
                         />
