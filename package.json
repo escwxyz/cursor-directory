@@ -56,8 +56,6 @@
     }
   ],
   "dependencies": {
-    "@babel/parser": "^7.25.6",
-    "@babel/types": "^7.25.6",
     "@raycast/api": "^1.81.2",
     "@raycast/utils": "^1.16.3",
     "node-fetch": "^3.3.2"
