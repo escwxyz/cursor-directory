@@ -59,3 +59,36 @@ export async function fetchCursorRules(popularOnly: boolean): Promise<CursorRule
     throw new Error("Failed to fetch cursor rules");
   }
 }
+
+// TODO: we still need to parse TS file into valid json, unless an API endpoint is provided when there are enough videos.
+
+// const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/pontusab/cursor.directory/main/src/data/videos.ts';
+
+// export async function fetchVideosData(): Promise<Video[]> {
+//   try {
+//     const response = await fetch(GITHUB_RAW_URL);
+//     const text = await response.text();
+
+//     // console.debug(text);
+
+//     // Extract the videos array from the TypeScript code
+//     const match = text.match(/export const videos = (\[[\s\S]*?\]);/);
+//     if (!match) {
+//       throw new Error('Unable to find videos data in the file');
+//     }
+
+//     const videosString = match[1];
+//     const validJsonString = convertToValidJson(videosString);
+//     const videosData = JSON.parse(validJsonString);
+
+//     console.debug(videosData);
+
+//     // Save the data to a local cache file
+//     // await saveJsonToCache('videos', videosData);
+
+//     return videosData;
+//   } catch (error) {
+//     console.error('Error fetching videos data:', error);
+//     throw error;
+//   }
+// }
