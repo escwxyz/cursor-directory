@@ -2,6 +2,7 @@ import { Grid, Image, ActionPanel, Action } from "@raycast/api";
 import { Video } from "./types";
 import { getAvatarIcon } from "@raycast/utils";
 import { getYoutubeVideoId, isImageUrl } from "./utils";
+import { OpenPrefAction } from "./components/actions/OpenPrefAction";
 
 // TODO temperary solution
 const videos: Video[] = [
@@ -152,7 +153,12 @@ export default function Command() {
           }}
           actions={
             <ActionPanel>
-              <Action.OpenInBrowser url={`https://www.youtube.com/watch?v=${getYoutubeVideoId(video.url)}`} />
+              <ActionPanel.Section title="Actions">
+                <Action.OpenInBrowser url={`https://www.youtube.com/watch?v=${getYoutubeVideoId(video.url)}`} />
+              </ActionPanel.Section>
+              <ActionPanel.Section title="Settings">
+                <OpenPrefAction />
+              </ActionPanel.Section>
             </ActionPanel>
           }
         />
