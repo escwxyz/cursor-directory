@@ -1,6 +1,6 @@
 import type { Author, CursorRule, Project, Section } from "./types";
 import fs from "fs/promises";
-import  { homedir, userInfo } from "os";
+import { homedir, userInfo } from "os";
 import path from "path";
 import { parse as parseYaml } from "yaml";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -46,7 +46,8 @@ export function isImageUrl(url: string): boolean {
 
   const isDataUri = url.startsWith("data:image/");
 
-  const isImageExtension = imageExtensions.includes(url.substring(url.lastIndexOf(".")).toLowerCase()) || url.endsWith(".svg");
+  const isImageExtension =
+    imageExtensions.includes(url.substring(url.lastIndexOf(".")).toLowerCase()) || url.endsWith(".svg");
 
   const isGitHubAvatar = url.includes("avatars.githubusercontent.com");
 
@@ -178,7 +179,7 @@ export async function openInCursor(path: string, successMessage?: string, callba
       resolve();
     }
   });
-} 
+}
 
 export async function loadProjects(): Promise<Project[]> {
   try {
