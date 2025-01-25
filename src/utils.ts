@@ -144,21 +144,32 @@ export function expandPath(path: string) {
 }
 
 export async function ensureCursorRulesFile(projectPath: string): Promise<void> {
-  const cursorRulesPath = path.join(projectPath, ".cursorrules");
+  const cursorRulesDir = path.join(projectPath, ".cursor", "rules");
   try {
-    await fs.access(cursorRulesPath);
-  } catch {
-    await fs.writeFile(cursorRulesPath, "");
+    await fs.mkdir(cursorRulesDir, { recursive: true });
+  } catch (error) {
+    console.error("Error creating cursor rules directory:", error);
+    throw error;
   }
 }
+export async function applyCursorRule(
+  projectPath: string,
+  ruleName: string,
+  ruleContent: string,
+  replace: boolean,
+): Promise<void> {
+  const cursorRulesDir = path.join(projectPath, ".cursor", "rules");
+  const cursorRulesPath = path.join(cursorRulesDir, ruleName);
 
-export async function applyCursorRule(projectPath: string, ruleContent: string, replace: boolean): Promise<void> {
-  const cursorRulesPath = path.join(projectPath, ".cursorrules");
-
-  if (replace) {
-    await fs.writeFile(cursorRulesPath, ruleContent);
-  } else {
-    await fs.appendFile(cursorRulesPath, "\n" + ruleContent);
+  try {
+    if (replace) {
+      await fs.writeFile(cursorRulesPath, ruleContent);
+    } else {
+      await fs.appendFile(cursorRulesPath, "\n" + ruleContent);
+    }
+  } catch (error) {
+    console.error("Error applying cursor rule:", error);
+    throw error;
   }
 
   await showHUD("Cursor rules applied successfully");
